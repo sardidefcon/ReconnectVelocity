@@ -17,7 +17,11 @@ dependencies {
     compileOnly(libs.litebans.api)
     compileOnly(libs.luckperms.api)
 
-    implementation(libs.storage.yaml)
+    // SnakeYAML 1.33 empaquetado y reubicado para evitar conflicto con el SnakeYAML del servidor (Velocity/Paper)
+    implementation(libs.snakeyaml)
+    implementation(libs.storage.yaml) {
+        exclude(group = "org.yaml", module = "snakeyaml")
+    }
     implementation(libs.storage.mysql)
     implementation(libs.storage.maria)
     implementation(libs.storage.sqlite)
@@ -39,6 +43,8 @@ tasks {
     }
     shadowJar {
         mergeServiceFiles()
+        // Reubicar SnakeYAML para que el plugin use su propia copia y no la del servidor
+        relocate("org.yaml.snakeyaml", "com.mattmx.reconnect.lib.org.yaml.snakeyaml")
     }
     runVelocity {
         velocityVersion(libs.versions.velocity.get())
